@@ -8,7 +8,8 @@ export default function Snake({fractions}) {
       key={`${fraction[0]}${fraction[1]}`}
       style={{
         left: `${fraction[0]}%`,
-        top: `${fraction[1]}%`
+        top: `${fraction[1]}%`,
+        background: (fraction[0] == 101) && 'white'
       }}></div>)
   )
 

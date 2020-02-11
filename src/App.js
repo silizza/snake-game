@@ -1,141 +1,82 @@
 import React, {useState, useEffect} from 'react';
-import Food from './Food';
-import Snake from './Snake';
+import Game from './Game';
 
-export default function App() {
 
-  const getRandomCoords = () => {
-    let x = Math.floor(Math.random() * 50) * 2;
-    let y = Math.floor(Math.random() * 50) * 2;
-    return [x, y];
-  }
-
-  const initialSnakeFractions = [
-    [0, 0], 
-    [2, 0], 
-    [4, 0]
-  ];
-
-  const [foodCoords, setFoodCoords] = useState(getRandomCoords());
-  const [snakeFractions, setSnakeFractions] = useState(initialSnakeFractions);
-  const [snakeDirection, setSnakeDirecion] = useState('RIGHT');
-  const [speed, setSpeed] = useState(300)
-
+export default function App() {    
+  //localStorage.clear();
+  const [highScores, setHighScores] = useState('');  
+  const [smallestScore, setSmallestScore] = useState(0);  
+  const [currentLength, setCurrentLength] = useState(3);
+  const [highScoresList, setHighScoresList] = useState('');
+  
   useEffect(() => {
-    document.onkeydown = onKeyDown;
-    let timer = setInterval(moveSnake, speed);    
-    checkIfEatFood();
-    return (() => {
-      clearInterval(timer);
-      document.removeEventListener('keydown', onKeyDown);
+    if(localStorage.highScores) {
+      updateHighScores();
     }
-  )
-})
+  }, [])
 
-  const onKeyDown = e => {
-    switch (e.code) {
-
-      case "ArrowRight": 
-        setSnakeDirecion('RIGHT');
-        break;
-      case "ArrowLeft": 
-        setSnakeDirecion('LEFT');
-        break;
-      case "ArrowUp": 
-        setSnakeDirecion('UP');
-        break;
-      case "ArrowDown": 
-        setSnakeDirecion('DOWN');
-        break;
-    }
+  const changeLength = (number) => {
+    setCurrentLength(number);
   }
 
-  const moveSnake = () => {
+  const addHighScore = (name, number) => {
 
-    let headX = snakeFractions[snakeFractions.length - 1][0];
-    let headY = snakeFractions[snakeFractions.length - 1][1];
-    
-    let newSnake = [...snakeFractions];
-    
-    switch (snakeDirection) {      
+    let scores = highScores ? highScores.split(',') : [];    
 
-      case "RIGHT":        
-          newSnake.push([headX + 2, headY]);
-          newSnake.shift();
-          break;
-      case "LEFT":       
-          newSnake.push([headX - 2, headY]);
-          newSnake.shift();        
-          break;
-      case "DOWN":        
-          newSnake.push([headX, headY + 2]);
-          newSnake.shift();        
-          break;
-      case "UP":        
-          newSnake.push([headX, headY - 2]);
-          newSnake.shift();        
-          break;        
-    }      
-    
+    scores.push(`${number}_${name}`);
+    scores.sort((score1, score2) => parseInt(score2) - parseInt(score1));
 
-    if (checkIfBump(newSnake)) {
-      alert('Game over!')
-      setSnakeFractions(initialSnakeFractions);
-      setSnakeDirecion('RIGHT');
-      return;
+    if (scores.length > 5) {
+      scores.pop();
     }
 
-    setSnakeFractions(newSnake);     
-  }
+    const scoresStr = scores.join(',');
 
-  const checkIfBump = (newSnake) => {  
+    localStorage.setItem('highScores', scoresStr);
 
-    const x = newSnake[newSnake.length - 1][0];
-    const y = newSnake[newSnake.length - 1][1];
+    updateHighScores();   
+  } 
 
-    //out of borders
-    if (x < 0 || x >= 100 || y < 0 || y >= 100) {
-      return true;
-    } 
+  const updateHighScores = () => {
 
-    let snake = [...newSnake];
-    snake.pop();
+    console.log(localStorage.highScores)
     
-    //bump into itself
-    for (let fraction of snake) {
-      if (fraction[0] == x && fraction[1] == y) {
-        return true;
-      }
-    }
+    let scores = localStorage.highScores.split(',');
+    
+    let listOfScores = scores.map(score => {
+      let result = score.split('_');
+      return (<div key={scores.indexOf(score)} className="flex-container">
+                <span>{result[1]}</span>
+                <span>{result[0]}</span>
+              </div>);
+    });
 
-    return false;
-  }
+    setHighScoresList(listOfScores);
 
-  const checkIfEatFood = () => {
-    let newSnake = [...snakeFractions]
-    let headX = snakeFractions[snakeFractions.length - 1][0];
-    let headY = snakeFractions[snakeFractions.length - 1][1];
-
-    if(headX == foodCoords[0] && headY == foodCoords[1]) {
-      newSnake.unshift([]);
-      console.log(newSnake)
-      setSnakeFractions(newSnake);
-      setFoodCoords(getRandomCoords());
-      accelerate();
-    }
-  }
-
-  const accelerate = () => {
-    if (speed > 10) {
-      setSpeed(prev => prev - 10);
-    }
-    console.log(speed);
+    let smallest = (scores.length < 5) ? 0 : parseInt(scores[scores.length - 1]);
+    
+    setHighScores(localStorage.highScores);
+    setSmallestScore(smallest);    
   }
 
   return (
-    <div className="game-area">
-      <Food coords={foodCoords} />
-      <Snake fractions={snakeFractions} />
+    <div className="App">
+      <div className="statistics">
+        <h3>Current score</h3>
+        <div className="flex-container">
+          <span>Snake length</span>
+          <span>{currentLength}</span>
+        </div>
+      </div>
+      <Game
+        addHighScore={addHighScore}
+        smallestScore={smallestScore}
+        enlarge={changeLength}
+      />
+      <div className="statistics">
+        <h3>High scores</h3>
+        {highScoresList}
+      </div>
     </div>
   );
 }

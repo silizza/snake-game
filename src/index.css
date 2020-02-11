@@ -1,23 +1,58 @@
+.root {
+  font-size: 20px;
+}
+
+.App {
+  display: flex;  
+  justify-content: space-around; 
+}
+
 .game-area {
   position: relative;
   margin: auto;
   height: 600px;
   width: 600px;
-  border: solid black 1px;
+  border: groove rgb(124, 206, 86) 2px;
+  border-radius: 5px;
+  background-color: rgb(251, 255, 231);
 }
 
 .food {
   position: absolute;
   width: 2%;
   height: 2%;
-  background-color: red;
-  border: solid white 1px;
+  background: -o-linear-gradient(top left, red, rgb(255, 255, 255));   
+  background: -moz-linear-gradient(top left, red, rgb(255, 255, 255));
+  background: -webkit-linear-gradient(top left, red, rgb(255, 226, 59));
+  box-shadow: -1px -4px 3px -3px rgb(56, 54, 54);  
+  border-radius: 5px;
 }
 
 .snake-fraction {
   position: absolute;
   height: 2%;
   width: 2%;
-  background-color: black;
-  border: solid white 1px;
+  background: -o-linear-gradient(top left, green, yellow);   
+  background: -moz-linear-gradient(top left, green, yellow);
+  background: -webkit-linear-gradient(top left, green, yellow);  
+  border-radius: 3px;
+  box-shadow: -1px -4px 3px -3px rgb(56, 54, 54);
 }
+
+.statistics{
+  color: green;
+  width: 25%;
+  text-align: center;  
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-size: 2rem;
+}
+
+.flex-container {   
+  display: flex;
+  justify-content: space-between;  
+}
+
+.flex-container span {
+  margin: 10px;
+}
+
